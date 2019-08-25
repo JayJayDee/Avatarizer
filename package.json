@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "TS_NODE_FILES=true nodemon --watch ./demo -e ts --exec ts-node -- --project ./tsconfig.json ./demo",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest -c jest.config.js",
     "lint": "tslint -t stylish --project ./tsconfig.json"
   },
   "repository": {
@@ -20,7 +20,10 @@
   "homepage": "https://github.com/JayJayDee/Avatarizer#readme",
   "devDependencies": {
     "@types/glob": "^7.1.1",
+    "@types/jest": "^24.0.18",
     "@types/node": "^12.7.2",
+    "babel-jest": "^24.9.0",
+    "jest": "^24.9.0",
     "nodemon": "^1.19.1",
     "ts-node": "^8.3.0",
     "tslib": "^1.10.0",
