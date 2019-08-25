@@ -3,5 +3,9 @@ export {
 } from './types';
 
 export {
-  defaultAvatarizer as avatarize
+  AvatarizerInitError
+} from './errors';
+
+export {
+  initDefaultAvatarizer as initAvatarizer
 } from './default-avatarizer';

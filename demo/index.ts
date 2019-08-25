@@ -1,6 +1,6 @@
-import { avatarize } from '../lib';
+import { initAvatarizer } from '../lib';
 
 (async () => {
-  const res = await avatarize();
+  const res = await initAvatarizer();
   console.log(res);
 })();

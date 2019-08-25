@@ -1,8 +1,11 @@
-import { Avatarize } from './types';
+import { Initialize } from './types';
 
-export const defaultAvatarizer: Avatarize =
-  async (seed, opts) => {
-    return {
-      path: ''
+export const initDefaultAvatarizer: Initialize =
+  async (param) => {
+
+    return async (seed, opts) => {
+      return {
+        path: ''
+      };
     };
   };

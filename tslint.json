@@ -1,9 +1,7 @@
 {
   "linterOptions": {
       "exclude": [
-          "dist/**/*.ts",
-          "src/vendor/**/*.*",
-          "test/auth/index.test.ts"
+        "dist/**/*.ts"
       ]
   },
   "jsRules": {
