@@ -3,3 +3,9 @@ export class AvatarizerInitError extends Error {
     super(msg);
   }
 }
+
+export class ResourceNotFoundError extends AvatarizerInitError {
+  constructor(missingResPath: string) {
+    super(`resource not found: ${missingResPath}`);
+  }
+}
