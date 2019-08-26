@@ -9,3 +9,9 @@ export class ResourceNotFoundError extends AvatarizerInitError {
     super(`resource not found: ${missingResPath}`);
   }
 }
+
+export class MalformedResourceError extends AvatarizerInitError {
+  constructor(cause: string) {
+    super(cause);
+  }
+}

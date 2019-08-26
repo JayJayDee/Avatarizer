@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "TS_NODE_FILES=true nodemon --watch ./demo -e ts --exec ts-node -- --project ./tsconfig.json ./demo",
+    "dev": "TS_NODE_FILES=true nodemon --watch ./lib -e ts --exec ts-node -- --project ./tsconfig.json ./demo",
     "test": "jest -c jest.config.js",
     "lint": "tslint -t stylish --project ./tsconfig.json"
   },
