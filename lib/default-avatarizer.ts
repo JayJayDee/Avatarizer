@@ -10,4 +10,4 @@ export const initDefaultAvatarizer: Initialize =
         path: ''
       };
     };
-  };
+};

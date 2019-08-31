@@ -25,20 +25,27 @@ export const loadAndValidateResources =
     let resourceRoot = __dirname;
     if (param && param.resourcePath) resourceRoot = param.resourcePath;
 
+    const readDirAsync = promisify(readdir);
+    const readRes = readResourcesInDir({ readDirAsync });
+
     // 1. read resource groups from resource root.
-    // const promises = groupNames.map((d) =>
-    //   readResourcesInDir(join(resourceRoot, d))
-    //     .then((contents) => ({
-    //       name: d,
-    //       contents
-    //     })));
+    const promises = groupNames.map((d) =>
+      readRes(join(resourceRoot, d))
+        .then((contents) => ({
+          name: d,
+          contents
+        })));
 
     // 2. validate each groups.
-    // const groups = await Promise.all(promises);
-    // await Promise.all(groups.map(validateGroup));
+    const groups = await Promise.all(promises);
+
+    const statAsync = promisify(stat);
+
+    const validate = validateGroup({ statAsync, extName: extname });
+    await Promise.all(groups.map(validate));
   };
 
-const validateGroup =
+export const validateGroup =
   ({ statAsync, extName }:
     { statAsync: (path: string) => Promise<Stats>,
       extName: (path: string) => string }) =>
