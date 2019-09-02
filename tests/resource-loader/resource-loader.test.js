@@ -1,7 +1,6 @@
-const { validateGroup } = require('../../lib/resource-loader');
+const { validateGroup, readResourcesInDir } = require('../../lib/resource-loader');
 
 describe('resource-loader::validateGroup() tests', () => {
-
   const statAsyncIsNotFile = (path) =>
     new Promise((resolve, reject) => {
       const a = {
@@ -13,7 +12,7 @@ describe('resource-loader::validateGroup() tests', () => {
   const statAsyncIsFile = (path) =>
     new Promise((resolve, reject) => {
       const a = {
-        isFile: () => false
+        isFile: () => true
       };
       resolve(a);
     });
@@ -46,8 +45,8 @@ describe('resource-loader::validateGroup() tests', () => {
 
   test('when the nested content wasn\'t a PNG file, must be throw error', () => {
     const validate = validateGroup({
-      statAsync: statAsyncIsNotFile,
-      extName: extNamePng
+      statAsync: statAsyncIsFile,
+      extName: extNameNotPng
     });
 
     const grp = {
@@ -57,17 +56,13 @@ describe('resource-loader::validateGroup() tests', () => {
       ]
     };
 
-    validate(grp).then(() => {
-      expect().nthCalledWith(0);
-    }).catch((err) => {
-      expect(err).toBeInstanceOf(Error);
-    });
+    expect(validate(grp)).rejects.toBeInstanceOf(Error);
   });
 
   test('when the nested contents have no problem, whether it\'s capital case or not, must be passed', () => {
     const validate = validateGroup({
       statAsync: statAsyncIsFile,
-      extName: extNameNotPng
+      extName: extNamePng
     });
 
     const validate2 = validateGroup({
@@ -82,23 +77,31 @@ describe('resource-loader::validateGroup() tests', () => {
       ]
     };
 
-    validate(grp).then(() => {
-      expect().toBeCalled(1);
-    }).catch((err) => {
-      expect().toBeCalled(0);
-    });
-
-    validate2(grp).then(() => {
-      expect().toBeCalled(1);
-    }).catch((err) => {
-      expect().toBeCalled(0);
-    });
+    expect(() => validate(grp)).not.toThrow();
+    expect(() => validate2(grp)).not.toThrow();
   });
 });
 
 
 describe('resource-loader::readResourcesInDir() tests', () => {
-  test('path and its contents must be merged', () => {
+  const readDirAsync = (path) =>
+    new Promise((resolve, reject) =>
+      ['a', 'b', 'c']);
 
+  test('path and its contents must be merged', () => {
+    const join = (...args) => `${args[0]}${args[1]}`;
+    const readDir = readResourcesInDir({ readDirAsync, join });
+    expect(readDir('a')).resolves.toBe(['aa', 'ab', 'ac']);
   });
+
+  test('number of readResourcesIndir() must be same as number of  readDirAsync() result.', () => {
+    const join = (...args) => `${args[0]}${args[1]}`;
+    const readDir = readResourcesInDir({ readDirAsync, join });
+    expect(readDir('a')).resolves.toHaveLength(3);
+  });
+});
+
+
+describe('loadAndValidateResources() tests', () => {
+
 });

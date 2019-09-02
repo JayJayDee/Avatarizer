@@ -64,7 +64,7 @@ export const validateGroup =
         await Promise.all(promises);
       };
 
-const readResourcesInDir =
+export const readResourcesInDir =
   ({ readDirAsync, join }:
     { readDirAsync: (path: string) => Promise<string[]>,
       join: (...args: any[]) => string }) =>
