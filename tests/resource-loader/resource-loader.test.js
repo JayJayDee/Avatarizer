@@ -63,4 +63,42 @@ describe('resource-loader::validateGroup() tests', () => {
       expect(err).toBeInstanceOf(Error);
     });
   });
+
+  test('when the nested contents have no problem, whether it\'s capital case or not, must be passed', () => {
+    const validate = validateGroup({
+      statAsync: statAsyncIsFile,
+      extName: extNameNotPng
+    });
+
+    const validate2 = validateGroup({
+      statAsync: statAsyncIsFile,
+      extName: extNamePngCapitalCase
+    });
+
+    const grp = {
+      name: 'test-name',
+      contents: [
+        'a', 'b'
+      ]
+    };
+
+    validate(grp).then(() => {
+      expect().toBeCalled(1);
+    }).catch((err) => {
+      expect().toBeCalled(0);
+    });
+
+    validate2(grp).then(() => {
+      expect().toBeCalled(1);
+    }).catch((err) => {
+      expect().toBeCalled(0);
+    });
+  });
+});
+
+
+describe('resource-loader::readResourcesInDir() tests', () => {
+  test('path and its contents must be merged', () => {
+
+  });
 });
