@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "TS_NODE_FILES=true nodemon --watch ./lib -e ts --exec ts-node -- --project ./tsconfig.json ./demo",
-    "test": "jest -c jest.config.js",
+    "test": "NODE_ENV=testing jest -c jest.config.js",
     "lint": "tslint -t stylish --project ./tsconfig.json"
   },
   "repository": {
@@ -27,9 +27,11 @@
     "@types/sharp": "^0.22.2",
     "babel-jest": "^24.9.0",
     "babel-plugin-rewire": "^1.2.0",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.2",
     "jest": "^24.9.0",
     "nodemon": "^1.19.1",
     "rewire": "^4.0.1",
+    "ts-jest": "^24.0.2",
     "ts-node": "^8.3.0",
     "tslib": "^1.10.0",
     "tslint": "^5.19.0",

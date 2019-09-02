@@ -1,6 +1,4 @@
-import { promisify } from 'util';
-import { join, extname } from 'path';
-import { readdir, stat, Stats } from 'fs';
+import { Stats } from 'fs';
 import { MalformedResourceError } from './errors';
 
 type LoaderParam = {
@@ -21,29 +19,35 @@ const groupNames = [
 ];
 
 export const loadAndValidateResources =
-  async (param?: LoaderParam) => {
-    let resourceRoot = __dirname;
-    if (param && param.resourcePath) resourceRoot = param.resourcePath;
+  ({ readDirAsync, statAsync, extName, join }:
+    {
+      readDirAsync: () => Promise<string[]>,
+      statAsync: () => Promise<Stats>,
+      extName: (path: string) => string,
+      join: (...args: any[]) => string
+    }) =>
+    async (param?: LoaderParam) => {
+      let resourceRoot = __dirname;
+      if (param && param.resourcePath) resourceRoot = param.resourcePath;
+      const readRes = readResourcesInDir({ readDirAsync, join });
 
-    const readDirAsync = promisify(readdir);
-    const readRes = readResourcesInDir({ readDirAsync });
+      // 1. read resource groups from resource root.
+      const promises = groupNames.map((d) =>
+        readRes(join(resourceRoot, d))
+          .then((contents) => ({
+            name: d,
+            contents
+          })));
 
-    // 1. read resource groups from resource root.
-    const promises = groupNames.map((d) =>
-      readRes(join(resourceRoot, d))
-        .then((contents) => ({
-          name: d,
-          contents
-        })));
+      // 2. validate each groups.
+      const groups = await Promise.all(promises);
 
-    // 2. validate each groups.
-    const groups = await Promise.all(promises);
+      const validate = validateGroup({ statAsync, extName });
+      await Promise.all(groups.map(validate));
 
-    const statAsync = promisify(stat);
-
-    const validate = validateGroup({ statAsync, extName: extname });
-    await Promise.all(groups.map(validate));
-  };
+      // 3. return groups.
+      return groups;
+    };
 
 export const validateGroup =
   ({ statAsync, extName }:
@@ -61,8 +65,9 @@ export const validateGroup =
       };
 
 const readResourcesInDir =
-  ({ readDirAsync }:
-    { readDirAsync: (path: string) => Promise<string[]> }) =>
+  ({ readDirAsync, join }:
+    { readDirAsync: (path: string) => Promise<string[]>,
+      join: (...args: any[]) => string }) =>
 
     async (path: string) => {
       const contents = await readDirAsync(path);
