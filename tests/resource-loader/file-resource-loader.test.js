@@ -1,4 +1,4 @@
-const { validateGroup, readResourcesInDir } = require('../../lib/resource-loader');
+const { validateGroup, readResourcesInDir } = require('../../lib/resource-loader/file-resource-loader');
 
 describe('resource-loader::validateGroup() tests', () => {
   const statAsyncIsNotFile = (path) =>
@@ -86,7 +86,7 @@ describe('resource-loader::validateGroup() tests', () => {
 describe('resource-loader::readResourcesInDir() tests', () => {
   const readDirAsync = (path) =>
     new Promise((resolve, reject) =>
-      ['a', 'b', 'c']);
+      resolve(['a', 'b', 'c']));
 
   test('path and its contents must be merged', () => {
     const join = (...args) => `${args[0]}${args[1]}`;
@@ -103,5 +103,23 @@ describe('resource-loader::readResourcesInDir() tests', () => {
 
 
 describe('loadAndValidateResources() tests', () => {
+  const readDirAsyncTest = (path) =>
+    new Promise((resolve, reject) =>
+      resolve(['a', 'b', 'c']));
 
+  const statAsyncPass = (path) =>
+    new Promise((resolve, reject) =>
+      resolve({
+        isFile: () => true
+      }));
+
+  const extNamePass = (path) => '.png';
+
+  const extNameNotPass = (path) => '.jpg';
+
+  const join = (...args) => args.join(',');
+
+  test('test', () => {
+
+  });
 });

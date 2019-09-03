@@ -1,5 +1,5 @@
 import { Stats } from 'fs';
-import { MalformedResourceError } from './errors';
+import { MalformedResourceError } from '../errors';
 
 type LoaderParam = {
   resourcePath?: string;
@@ -19,21 +19,19 @@ const groupNames = [
 ];
 
 export const loadAndValidateResources =
-  ({ readDirAsync, statAsync, extName, join }:
+  ({ readResources, join, validate }:
     {
-      readDirAsync: () => Promise<string[]>,
-      statAsync: () => Promise<Stats>,
-      extName: (path: string) => string,
-      join: (...args: any[]) => string
+      readResources: (path: string) => Promise<string[]>,
+      join: (...args: string[]) => string,
+      validate: (grp: Group) => Promise<void>
     }) =>
     async (param?: LoaderParam) => {
       let resourceRoot = __dirname;
       if (param && param.resourcePath) resourceRoot = param.resourcePath;
-      const readRes = readResourcesInDir({ readDirAsync, join });
 
       // 1. read resource groups from resource root.
       const promises = groupNames.map((d) =>
-        readRes(join(resourceRoot, d))
+        readResources(join(resourceRoot, d))
           .then((contents) => ({
             name: d,
             contents
@@ -41,8 +39,6 @@ export const loadAndValidateResources =
 
       // 2. validate each groups.
       const groups = await Promise.all(promises);
-
-      const validate = validateGroup({ statAsync, extName });
       await Promise.all(groups.map(validate));
 
       // 3. return groups.
