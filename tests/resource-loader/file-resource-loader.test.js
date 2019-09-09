@@ -130,6 +130,7 @@ describe('resource-loader::loadAndValidateResources() tests', () => {
       new Promise((resolve, reject) => {
         const splited = path.split('/');
         expect(splited[0]).toBe('test');
+        expect(groupNames.includes(splited[1])).toEqual(true);
         resolve([]);
       });
       
@@ -160,14 +161,33 @@ describe('resource-loader::loadAndValidateResources() tests', () => {
 
   test('if all sub-functions passes, the result must resolved', () => {
     const readResourcesTest = (path) =>
-      new Promise((resolve) => resolve(
-        groupNames.map((g) => `${path}/`)
-      ));
+      new Promise((resolve) => {
+        const files = ['a', 'b'];
+        resolve(files.map((f) => `${path}/${f}`))
+      });
 
     const loadAndValidate = loadAndValidateResources({
       join,
       readResources: readResourcesTest,
-      validate: validateNotPass
+      validate: validatePass
+    });
+
+    loadAndValidate({ resourcePath: 'test' }).then((resp) => {
+      resp.forEach((r) => {
+        expect(groupNames.includes(r.name)).toEqual(true);
+        expect(r.contents.length).toBe(2);
+
+        const contents = [
+          `test/${r.name}/a`,
+          `test/${r.name}/b`
+        ];
+        r.contents.forEach((c) => {
+          expect(contents.includes(c)).toEqual(true);
+        });
+      });
+    })
+    .catch((err) => {
+      throw err;
     });
   });
 });
