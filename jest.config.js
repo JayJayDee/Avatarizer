@@ -9,5 +9,6 @@ module.exports = {
     'ts-jest': {
       diagnostics: true
     }
-  }
+  },
+  setupFilesAfterEnv: ['jest-extended']
 };

@@ -1,4 +1,8 @@
-const { validateGroup, readResourcesInDir } = require('../../lib/resource-loader/file-resource-loader');
+import {
+  validateGroup,
+  readResourcesInDir,
+  loadAndValidateResources
+} from '../../lib/resource-loader/file-resource-loader';
 
 describe('resource-loader::validateGroup() tests', () => {
   const statAsyncIsNotFile = (path) =>
@@ -91,7 +95,7 @@ describe('resource-loader::readResourcesInDir() tests', () => {
   test('path and its contents must be merged', () => {
     const join = (...args) => `${args[0]}${args[1]}`;
     const readDir = readResourcesInDir({ readDirAsync, join });
-    expect(readDir('a')).resolves.toBe(['aa', 'ab', 'ac']);
+    expect(readDir('a')).resolves.toStrictEqual(['aa', 'ab', 'ac']);
   });
 
   test('number of readResourcesIndir() must be same as number of  readDirAsync() result.', () => {
@@ -102,24 +106,68 @@ describe('resource-loader::readResourcesInDir() tests', () => {
 });
 
 
-describe('loadAndValidateResources() tests', () => {
-  const readDirAsyncTest = (path) =>
-    new Promise((resolve, reject) =>
-      resolve(['a', 'b', 'c']));
+describe('resource-loader::loadAndValidateResources() tests', () => {
+  const groupNames = [
+    'body-shapes',
+    'clothes',
+    'face-shapes',
+    'face-components',
+    'hairs'
+  ];
 
-  const statAsyncPass = (path) =>
-    new Promise((resolve, reject) =>
-      resolve({
-        isFile: () => true
-      }));
+  const join = (...args) => args.join('/');
 
-  const extNamePass = (path) => '.png';
+  const validatePass = (grp) =>
+    new Promise((resolve, reject) => resolve({}));
 
-  const extNameNotPass = (path) => '.jpg';
+  const validateNotPass = (grp) => 
+    new Promise((resolve, reject) => {
+      throw new Error('test error');
+    });
 
-  const join = (...args) => args.join(',');
+  test('if the resourceRoot path provided, readResource() must be supplied that', () => {
+    const readResourcesTest = (path) =>
+      new Promise((resolve, reject) => {
+        const splited = path.split('/');
+        expect(splited[0]).toBe('test');
+        resolve([]);
+      });
+      
+    const loadAndValidate = loadAndValidateResources({
+      join,
+      readResources: readResourcesTest,
+      validate: validatePass
+    });
 
-  test('test', () => {
+    expect(loadAndValidate({ resourcePath: 'test' })).toResolve();
+  });
 
+  test('if there is a exception in validateGroup(), must be throw exception', () => {
+    const readResourcesTest = () =>
+      new Promise((resolve) => [
+        'test',
+        'test2'
+      ]);
+
+    const loadAndValidate = loadAndValidateResources({
+      join,
+      readResources: readResourcesTest,
+      validate: validateNotPass
+    });
+
+    expect(loadAndValidate({ resourcePath: 'test' })).toReject();
+  });
+
+  test('if all sub-functions passes, the result must resolved', () => {
+    const readResourcesTest = (path) =>
+      new Promise((resolve) => resolve(
+        groupNames.map((g) => `${path}/`)
+      ));
+
+    const loadAndValidate = loadAndValidateResources({
+      join,
+      readResources: readResourcesTest,
+      validate: validateNotPass
+    });
   });
 });
