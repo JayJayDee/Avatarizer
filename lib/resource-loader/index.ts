@@ -3,15 +3,25 @@ import { readdir, stat } from 'fs';
 import { promisify } from 'util';
 import { readResourcesInDir, validateGroup, loadAndValidateResources } from './file-resource-loader';
 
+type Group = {
+  name: string;
+  contents: string[];
+};
+
 export const initResourceLoader = ({
-  readDirSync
+  readResources,
+  validate
+}: {
+  readResources: (path: string) => Promise<string[]>,
+  validate: (grp: Group) => Promise<void>
 }) => {
-  const readDirAsync = promisify(readdir);
-  const statAsync = promisify(stat);
-
-  const readResources = readResourcesInDir({ readDirAsync, join });
-  const validate = validateGroup({ statAsync, extName: extname });
-
-  const loadResources = loadAndValidateResources({ readResources, validate, join });
-  return loadResources;
+  if (!readResources) {
+    const readDirAsync = promisify(readdir);
+    readResources = readResourcesInDir({ readDirAsync, join });
+  }
+  if (!validate) {
+    const statAsync = promisify(stat);
+    validate = validateGroup({ statAsync, extName: extname });
+  }
+  return loadAndValidateResources({ readResources, validate, join });
 };
