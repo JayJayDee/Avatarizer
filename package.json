@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "TS_NODE_FILES=true nodemon --watch ./lib -e ts --exec ts-node -- --project ./tsconfig.json ./demo",
     "test": "NODE_ENV=testing jest -c jest.config.js",
+    "test:coverage": "NODE_ENV=testing jest -c jest.config.js --coverage",
     "lint": "tslint -t stylish --project ./tsconfig.json"
   },
   "repository": {
