@@ -8,18 +8,26 @@ type Group = {
   contents: string[];
 };
 
-export const initResourceLoader = ({
-  readResources,
-  validate
-}: {
-  readResources: (path: string) => Promise<string[]>,
-  validate: (grp: Group) => Promise<void>
-}) => {
-  if (!readResources) {
+type Param = {
+  readResources: (path: string) => Promise<string[]>;
+  validate: (grp: Group) => Promise<void>;
+};
+
+export const initResourceLoader = (param?: Param) => {
+  let readResources = null;
+  let validate = null;
+
+  if (param) {
+    readResources = param.readResources;
+    validate = param.validate;
+  }
+
+  if (!param || !param.readResources) {
     const readDirAsync = promisify(readdir);
     readResources = readResourcesInDir({ readDirAsync, join });
   }
-  if (!validate) {
+
+  if (!param || !param.validate) {
     const statAsync = promisify(stat);
     validate = validateGroup({ statAsync, extName: extname });
   }
