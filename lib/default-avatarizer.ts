@@ -4,9 +4,8 @@ import { initResourceLoader } from './resource-loader';
 export const initDefaultAvatarizer: Initialize =
   async (param) => {
     const loadResources = initResourceLoader();
-    const loaded = await loadResources();
-
-    console.log(loaded);
+    const contents = await loadResources(param);
+    console.log(contents);
 
     return async (seed, opts) => {
       return {
